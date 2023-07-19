@@ -20,4 +20,6 @@ def lambda_handler(event, context):
             'upsertedAt': str(datetime.now()),
             'orders':[order.asdict()]
         })
+        
+    print(response)
     return response
