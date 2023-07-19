@@ -34,7 +34,7 @@ jobs:
       - name: deploy
         uses: mariamrf/py-lambda-action@1.0.1
         with:
-          lambda_layer_arn: "arn:aws:lambda:eu-west-2:819524876098:function:newOrderHandler"
+          lambda_layer_arn: "arn:aws:lambda:eu-west-2:819524876098:layer:python-layer:1"
           lambda_function_name: "newOrderHandler"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
