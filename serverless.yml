@@ -1,0 +1,16 @@
+service: newOrderHandler
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.10
+  stage: Prod
+
+functions:
+  hello:
+    handler: newOrderHandler
+
+plugins:
+  - serverless-plugin-canary-deployments
+  - serverless-python-requirements
