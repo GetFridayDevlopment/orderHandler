@@ -22,7 +22,7 @@ jobs:
         env:
           CI: true
       - name: deploy
-        uses: mariamrf/py-lambda-action@1.0.1
+        uses: kohrongying/py-lambda-action@v1.0.2
         with:
           lambda_layer_arn: "arn:aws:lambda:eu-west-2:819524876098:layer:python-layer"
           lambda_function_name: "newOrderHandler"
