@@ -27,11 +27,12 @@ jobs:
         env:
           CI: true
       - name: Upload Artefact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v3.1.2
         with:
           name: bundle.zip
           path: |
-            !dependencies/**/*.*
+            !./dependencies/**/*.*
+          if-no-files-found: error
       - name: Bundle Dependencies
         uses: montudor/action-zip@v1.0.0
         with:
