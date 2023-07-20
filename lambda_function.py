@@ -2,13 +2,15 @@ import boto3
 import uuid
 from customer import Customer
 from order import Order
+from lineitem import LineItem
 from datetime import datetime
 
 def lambda_handler(event, context):
     rawPayload = event['detail']['payload']
 
     cust = Customer(str(uuid.uuid4()), rawPayload['customer']['id'])
-    order = Order(rawPayload['id'], rawPayload['order_number'], rawPayload['total_price'])
+    order = Order(rawPayload['id'], rawPayload['order_number'], rawPayload['total_price'], )
+    order.addLineItem(LineItem("SKU1", 9))
 
     client = boto3.resource('dynamodb')
     table = client.Table("customer")
