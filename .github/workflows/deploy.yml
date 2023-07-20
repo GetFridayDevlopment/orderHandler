@@ -51,6 +51,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: bundle.zip
+          path: ./
       - uses: actions/checkout@v3
         with:
           fetch-depth: "0"
