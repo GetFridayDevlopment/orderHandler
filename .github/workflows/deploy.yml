@@ -41,7 +41,7 @@ jobs:
       - name: AWS Lambda Layer Publish
         uses: taotao2345/aws-lambda-publishlayer@v1.0.0
         env:
-          AWS_REGION: "eu-west-2"
+          AWS_REGION: ${{ matrix.aws_region }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         with:
@@ -78,19 +78,19 @@ jobs:
         uses: montudor/action-zip@v1.0.0
         with:
           args: zip -qq -r ./bundle.zip ./
-      - name: Deploy
-        uses: appleboy/lambda-action@v0.1.9
-        with:
-          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws_region: "eu-west-2"
-          function_name: newOrderHandler
-          zip_file: bundle.zip
-          description: ${{steps.tag.outputs.tag}}
       - name: Update layers
         uses: callummackenzie/latest-lambda-layer-action@v0.12
         with:
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws_region: "eu-west-2"
+          aws_region: ${{ matrix.aws_region }}
           function_name: newOrderHandler
+      - name: Deploy
+        uses: appleboy/lambda-action@v0.1.9
+        with:
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws_region: ${{ matrix.aws_region }}
+          function_name: newOrderHandler
+          zip_file: bundle.zip
+          description: ${{steps.tag.outputs.tag}}
