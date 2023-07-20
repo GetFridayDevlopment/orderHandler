@@ -30,6 +30,11 @@ jobs:
         uses: montudor/action-zip@v1.0.0
         with:
           args: zip -qq -r ./bundle.zip ./
+      - name: Upload Artefact
+        uses: actions/upload-artifact@v3
+        with:
+          name: bundle.zip
+          path: ./
 
   deploy-source:
     name: deploy lambda
@@ -42,6 +47,10 @@ jobs:
         aws_region: [eu-west-2]
     runs-on: ubuntu-latest
     steps:
+      - name: Download Bundle
+        uses: actions/download-artifact@v3
+        with:
+          name: bundle.zip
       - uses: actions/checkout@v3
         with:
           fetch-depth: "0"
