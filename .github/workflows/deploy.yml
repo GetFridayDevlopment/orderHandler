@@ -57,6 +57,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: true
           PRERELEASE: false
+          DEFAULT_BUMP: patch
       - name: Bundle
         uses: montudor/action-zip@v1.0.0
         with:
