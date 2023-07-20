@@ -31,7 +31,7 @@ jobs:
         with:
           name: bundle.zip
           path: |
-            !/dependencies
+            !dependencies/**/*.*
       - name: Bundle Dependencies
         uses: montudor/action-zip@v1.0.0
         with:
@@ -43,7 +43,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         with:
-          layer_name: newOrderHandler
+          layer_name: python-layer
           zip_file: dependencies.zip
   deploy-source:
     name: deploy lambda
