@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: create version
+      - name: Create version
         id: versioning
         uses: paulhatch/semantic-version@v5.0.3
         with:
@@ -44,11 +44,3 @@ jobs:
           zip_file: bundle.zip
           layers: arn:aws:lambda:eu-west-2:819524876098:layer:python-layer:5
           description: ${{ steps.versioning.outputs.version }}
-      - name: create release
-        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
-        with:
-          tag_name: ${{ steps.versioning.outputs.version }}
-          release_name: ${{ steps.versioning.outputs.version }}
