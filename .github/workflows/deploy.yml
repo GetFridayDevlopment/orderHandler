@@ -57,6 +57,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: true
           PRERELEASE: false
+      - name: Bundle
+        uses: montudor/action-zip@v1.0.0
+        with:
+          args: zip -qq -r ./bundle.zip ./
       - name: Deploy
         uses: appleboy/lambda-action@v0.1.9
         with:
@@ -64,6 +68,6 @@ jobs:
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_region: "eu-west-2"
           function_name: newOrderHandler
-          zip_file: ${{steps.download.outputs.download-path}}/bundle.zip
+          zip_file: bundle.zip
           layers: arn:aws:lambda:eu-west-2:819524876098:layer:python-layer:2
           description: ${{steps.tag.outputs.tag}}
