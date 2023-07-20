@@ -86,5 +86,11 @@ jobs:
           aws_region: "eu-west-2"
           function_name: newOrderHandler
           zip_file: bundle.zip
-          layers: arn:aws:lambda:eu-west-2:819524876098:layer:python-layer:2
           description: ${{steps.tag.outputs.tag}}
+      - name: Update layers
+        uses: callummackenzie/latest-lambda-layer-action@v0.12
+        with:
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws_region: "eu-west-2"
+          function_name: newOrderHandler
