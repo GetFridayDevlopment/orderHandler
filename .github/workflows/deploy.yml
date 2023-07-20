@@ -48,6 +48,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download Bundle
+        id: download
         uses: actions/download-artifact@v3
         with:
           name: bundle.zip
@@ -68,6 +69,6 @@ jobs:
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_region: "eu-west-2"
           function_name: newOrderHandler
-          zip_file: bundle.zip
+          zip_file: ${{steps.download.outputs.download-path}}/bundle.zip
           layers: arn:aws:lambda:eu-west-2:819524876098:layer:python-layer:2
           description: ${{steps.tag.outputs.tag}}
