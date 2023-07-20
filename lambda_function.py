@@ -24,6 +24,7 @@ def lambda_handler(event, context):
             'shopifyCustomerId':cust.shopifyCustomerId,
             'upsertedAt': str(datetime.now()),
             'orders':[order.asdict()]
+            'test': 'tester'
         })
         
     return response
