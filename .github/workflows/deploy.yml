@@ -23,7 +23,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install ruff pytest
-          if [ -f requirements.txt ]; then pip install -r requirements.txt -t ./dependencies;  fi
+          if [ -f requirements.txt ]; then pip install -r requirements.txt -t /dependencies;  fi
         env:
           CI: true
       - name: Upload Artefact
@@ -35,7 +35,7 @@ jobs:
       - name: Bundle Dependencies
         uses: montudor/action-zip@v1.0.0
         with:
-          args: zip -qq -r ./dependencies.zip ./dependencies
+          args: zip -qq -r ./dependencies.zip /dependencies
       - name: AWS Lambda Layer Publish
         uses: taotao2345/aws-lambda-publishlayer@v1.0.0
         env:
