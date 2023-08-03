@@ -7,10 +7,11 @@ class DynamoClient:
         self.order_table = client.Table("order")
         self.cust_table = client.Table("customer")
         
-    def put_customer(self, customer):
+    def put_customer(self, customer, order):
         self.cust_table.put_item(Item={
             'customerId':customer.customerId,
             'shopifyCustomerId':customer.shopifyCustomerId,
+            'orders':[order.id],
             'upsertedAt': str(datetime.now())
         })
     
@@ -19,15 +20,9 @@ class DynamoClient:
                     'orderId':order.id,
                     'sourceName':order.souce_name,
                     'sourceOrderId': order.source_order_id,
+                    'customerId': customer.customerId,
                     'totalPrice': order.price,
                     'orderItems': order.order_items,
                     'upsertedAt': str(datetime.now())
                 })
-    
-        self.cust_table.update_item(
-            Key={'customerId': customer.customerId},
-            AttributeUpdates={
-                'orders': [order.id],
-            }
-        )
 

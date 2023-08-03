@@ -8,5 +8,5 @@ def lambda_handler(event, context):
     order = Order(raw_payload)
 
     dynamo_client = DynamoClient()
-    dynamo_client.put_customer(cust)
+    dynamo_client.put_customer(cust, order)
     dynamo_client.put_order(order, cust)
