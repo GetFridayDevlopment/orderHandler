@@ -22,6 +22,7 @@ def lambda_handler(event, context):
                 'orderId':order.id,
                 'sourceName':order.souceName,
                 'sourceOrderId': order.sourceOrderId,
+                'totalPrice': order.price,
                 'orderItems': order.orderItems,
                 'upsertedAt': str(datetime.now())
             })
