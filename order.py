@@ -1,6 +1,9 @@
+import uuid
+
 class Order:
-  def __init__(self, id, number, price):
-    self.id = id
+  def __init__(self, shopifyId, number, price):
+    self.id =  str(uuid.uuid4())
+    self.shopifyOrderId = shopifyId
     self.orderNumber = number
     self.price = price
     self.lineItems = []
