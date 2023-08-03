@@ -1,38 +1,12 @@
-import boto3
-import uuid
+from dynamo_client import DynamoClient
 from customer import Customer
 from order import Order
-from datetime import datetime
-from lineitem import LineItem
 
-def lambda_handler(event, context):
-    rawPayload = event['detail']['payload']
+def lambda_handler(event):
+    raw_payload = event['detail']['payload']
+    cust = Customer(raw_payload)
+    order = Order(raw_payload)
 
-    cust = Customer(str(uuid.uuid4()), rawPayload['customer']['id'])
-    order = Order(rawPayload['id'], 'shopify', rawPayload['order_number'], rawPayload['total_price'])
-    
-    rawItems = rawPayload['line_items']
-    for item in rawItems:
-        order.addOrderItem(LineItem(item['sku'], item['price'])) 
-
-    client = boto3.resource('dynamodb')
-
-    orderTable = client.Table("order")
-    orderResponse = orderTable.put_item(Item={
-                'orderId':order.id,
-                'sourceName':order.souceName,
-                'sourceOrderId': order.sourceOrderId,
-                'totalPrice': order.price,
-                'orderItems': order.orderItems,
-                'upsertedAt': str(datetime.now())
-            })
-
-    custTable = client.Table("customer")
-    custResponse = custTable.put_item(Item={
-            'customerId':cust.customerId,
-            'shopifyCustomerId':cust.shopifyCustomerId,
-            'orders':[order.id],
-            'upsertedAt': str(datetime.now())
-        })
-        
-    return custResponse
+    dynamo_client = DynamoClient()
+    dynamo_client.put_customer(cust)
+    dynamo_client.put_order(order, cust)
