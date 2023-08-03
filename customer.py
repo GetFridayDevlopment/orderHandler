@@ -1,4 +1,4 @@
 class Customer:
   def __init__(self, id, shopifyCustomerId):
-    self.customerId = id
+    self.customerId = "C-"+id
     self.shopifyCustomerId = shopifyCustomerId

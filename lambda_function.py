@@ -34,4 +34,4 @@ def lambda_handler(event, context):
             'upsertedAt': str(datetime.now())
         })
         
-    return response
+    return custResponse
