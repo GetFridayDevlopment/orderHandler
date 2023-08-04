@@ -6,6 +6,11 @@ class DynamoClient:
         client = boto3.resource('dynamodb')
         self.order_table = client.Table("order")
         self.cust_table = client.Table("customer")
+
+    def get_customer(self, sourceCustomerId):
+        response = self.cust_table.get_item(Key={"sourceCustomerId": sourceCustomerId})
+        print("GET customer response:" + response)
+        return response
         
     def put_customer(self, customer, order):
         response = self.cust_table.put_item(Item={
