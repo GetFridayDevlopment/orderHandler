@@ -15,8 +15,9 @@ class DynamoClient:
             'orders':customer.orders,
             'upsertedAt': str(datetime.now())
         })
-        
-        return response
+
+        print("PUT Customer Response : " + response) 
+        return response['ResponseMetadata']['HTTPStatusCode'] == 200
     
     def put_order(self, order, customer):
         response = self.order_table.put_item(Item={
@@ -29,5 +30,6 @@ class DynamoClient:
                     'upsertedAt': str(datetime.now())
                 })
         
-        return response
+        print("PUT Order Response : " + response)
+        return response['ResponseMetadata']['HTTPStatusCode'] == 200
 
