@@ -1,7 +1,8 @@
 import uuid
 
 class Customer:
-  def __init__(self, payload):
+  def __init__(self, payload, order):
 
     self.customerId = "C-"+str(uuid.uuid4())
-    self.shopifyCustomerId = payload['customer']['id']
+    self.sourceCustomerId = payload['customer']['id']
+    self.orders = [order.id]

@@ -8,15 +8,18 @@ class DynamoClient:
         self.cust_table = client.Table("customer")
         
     def put_customer(self, customer, order):
-        self.cust_table.put_item(Item={
+        response = self.cust_table.put_item(Item={
             'customerId':customer.customerId,
-            'shopifyCustomerId':customer.shopifyCustomerId,
-            'orders':[order.id],
+            'sourceName':order.souce_name,
+            'sourceCustomerId':customer.sourceCustomerId,
+            'orders':customer.orders,
             'upsertedAt': str(datetime.now())
         })
+        
+        return response
     
     def put_order(self, order, customer):
-        self.order_table.put_item(Item={
+        response = self.order_table.put_item(Item={
                     'orderId':order.id,
                     'sourceName':order.souce_name,
                     'sourceOrderId': order.source_order_id,
@@ -25,4 +28,6 @@ class DynamoClient:
                     'orderItems': order.order_items,
                     'upsertedAt': str(datetime.now())
                 })
+        
+        return response
 
