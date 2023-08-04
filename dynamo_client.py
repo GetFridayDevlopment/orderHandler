@@ -1,4 +1,5 @@
 from datetime import datetime
+from boto3.dynamodb.conditions import Key
 import boto3
 
 class DynamoClient:
@@ -7,10 +8,13 @@ class DynamoClient:
         self.order_table = client.Table("order")
         self.cust_table = client.Table("customer")
 
-    def get_customer(self, sourceCustomerId):
-        response = self.cust_table.get_item(Key={"sourceCustomerId": sourceCustomerId})
-        print("GET customer response:" + response)
-        return response
+    def get_customers(self, source_customer_id):
+        print("source_customer_id " + str(source_customer_id))
+        response = self.cust_table.query(
+                IndexName='sourceCustomerId-index',
+                KeyConditionExpression=Key('sourceCustomerId').eq(source_customer_id)
+            )
+        return response['Items']
         
     def put_customer(self, customer, order):
         response = self.cust_table.put_item(Item={
@@ -21,7 +25,6 @@ class DynamoClient:
             'upsertedAt': str(datetime.now())
         })
 
-        print("PUT Customer Response : " + response) 
         return response['ResponseMetadata']['HTTPStatusCode'] == 200
     
     def put_order(self, order, customer):
@@ -35,6 +38,5 @@ class DynamoClient:
                     'upsertedAt': str(datetime.now())
                 })
         
-        print("PUT Order Response : " + response)
         return response['ResponseMetadata']['HTTPStatusCode'] == 200
 
