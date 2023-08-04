@@ -16,13 +16,13 @@ class DynamoClient:
             )
         return response['Items']
         
-    def put_customer(self, customer, order):
+    def put_customer(self, customer):
         response = self.cust_table.put_item(Item={
-            'customerId':customer.customerId,
-            'sourceName':order.souce_name,
-            'sourceCustomerId':customer.sourceCustomerId,
+            'customerId':customer.customer_id,
+            'sourceName':customer.souce_name,
+            'sourceCustomerId':customer.source_customer_id,
             'orders':customer.orders,
-            'upsertedAt': str(datetime.now())
+            'upsertedAt': customer.upserted_at
         })
 
         return response['ResponseMetadata']['HTTPStatusCode'] == 200
