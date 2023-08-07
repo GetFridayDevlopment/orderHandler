@@ -2,13 +2,22 @@ import uuid
 from datetime import datetime
 
 class Customer:
-  def __init__(self, payload, order):
+    def __init__(self, customer_id, source_name, source_customer_id, orders):
+        self.customer_id = customer_id
+        self.source_name = source_name
+        self.source_customer_id = source_customer_id
+        self.orders = orders
+        self.upserted_at = str(datetime.now())
 
-    self.customer_id = "C-"+str(uuid.uuid4())
-    self.source_name = "shopify"
-    self.source_customer_id = payload['customer']['id']
-    self.orders = [order.id]
-    self.upserted_at = str(datetime.now())
-
-  def from_dict(self, dict):
-    return self.__dict__.update(dict)
+    @classmethod
+    def from_dynamo(cls, dict):
+        cust = Customer(dict['customer_id'], dict['source_name'], dict['source_customer_id'], dict['orders'])
+        return cust
+    
+    @classmethod
+    def from_payload(cls, payload, order):
+        cust = Customer("C-"+str(uuid.uuid4()), "shopify", payload['customer']['id'], [order.id])
+        return cust
+    
+    def addOrder(self, order):
+        self.orders.append(order.id)

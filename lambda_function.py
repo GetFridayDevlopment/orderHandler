@@ -9,18 +9,20 @@ def lambda_handler(event, context):
     dynamo_client = DynamoClient()
 
     existing_customers = dynamo_client.get_customers(raw_payload['customer']['id'])
+    
     if len(existing_customers) > 1:
         print("Multiple customers returned for id: " + str(raw_payload['customer']['id']))
         return
-
-    cust = Customer(raw_payload, order)
     if len(existing_customers) == 0:
-        put_customer_success = dynamo_client.put_customer(cust)
-        if not put_customer_success:
-            print("Failed to save new customer:" + cust)
-            return
+        cust = Customer.from_payload(raw_payload, order)
     else:
-        cust = cust.from_dict(existing_customers[0])
+        cust = Customer.from_dynamo(existing_customers[0])
+        cust.addOrder(order)
+
+    put_customer_success = dynamo_client.put_customer(cust)
+    if not put_customer_success:
+        print("Failed to save new customer:" + cust)
+        return
 
     put_order_success = dynamo_client.put_order(order, cust)
     if not put_order_success:
