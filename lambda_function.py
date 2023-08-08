@@ -1,6 +1,7 @@
 from dynamo_client import DynamoClient
 from customer import Customer
 from order import Order
+from esim_go_client import EsimGoClient
 
 def lambda_handler(event, context):
     raw_payload = event['detail']['payload']
@@ -27,3 +28,6 @@ def lambda_handler(event, context):
     put_order_success = dynamo_client.put_order(order, cust)
     if not put_order_success:
         print("Failed to save new order:" + order)
+
+    esim_client = EsimGoClient()
+    esim_client.new_order(order)
