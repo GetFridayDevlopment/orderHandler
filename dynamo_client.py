@@ -1,5 +1,6 @@
 from datetime import datetime
 from boto3.dynamodb.conditions import Key
+from botocore.exceptions import ClientError
 import boto3
 
 
@@ -11,8 +12,16 @@ class DynamoClient:
 
     def get_customers(self, source_customer_id):
         print("source_customer_id " + str(source_customer_id))
-        fe = Key('sourceCustomerId').eq(source_customer_id)
-        response = self.cust_table.scan(fe)
+        try:
+            scan_kwargs = {
+                'FilterExpression': Key('sourceCustomerId').eq(source_customer_id),
+                'ExpressionAttributeNames': {"#sourceCustomerId": "sourceCustomerId"}}
+            response = self.cust_table.scan(scan_kwargs)
+        except ClientError as err:
+            print(
+                "Couldn't scan for customers. Here's why: %s: %s",
+                err.response['Error']['Code'], err.response['Error']['Message'])
+            raise
         return response['Items']
 
     def put_customer(self, customer):
