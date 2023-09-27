@@ -35,7 +35,7 @@ class DynamoClient:
             'orderId': order.id,
             'sourceName': order.source_name,
             'sourceOrderId': order.source_order_id,
-            'customerId': customer.customerId,
+            'customerId': customer.customer_id,
             'totalPrice': order.price,
             'orderItems': order.order_items,
             'upsertedAt': str(datetime.now())
