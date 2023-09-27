@@ -14,7 +14,7 @@ class DynamoClient:
         response = self.cust_table.query(
             IndexName='source_customer_id-index',
             KeyConditionExpression=Key(
-                'sourceCustomerId').eq(source_customer_id)
+                'source_customer_id').eq(source_customer_id),
         )
         return response['Items']
 
