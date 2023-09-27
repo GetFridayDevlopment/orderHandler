@@ -19,6 +19,7 @@ class DynamoClient:
         return response['Items']
 
     def put_customer(self, customer):
+        print(customer)
         response = self.cust_table.put_item(Item={
             'customerId': customer.customer_id,
             'sourceName': customer.souce_name,
