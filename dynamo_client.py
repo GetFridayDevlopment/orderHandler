@@ -12,6 +12,7 @@ class DynamoClient:
     def get_customers(self, source_customer_id):
         print("source_customer_id " + str(source_customer_id))
         response = self.cust_table.query(
+            IndexName='source_customer_id-index',
             KeyConditionExpression=Key(
                 'sourceCustomerId').eq(source_customer_id)
         )
