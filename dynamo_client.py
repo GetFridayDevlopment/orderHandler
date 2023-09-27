@@ -22,7 +22,7 @@ class DynamoClient:
         print(customer)
         response = self.cust_table.put_item(Item={
             'customer_id': customer.customer_id,
-            'source_name': customer.souce_name,
+            'source_name': customer.source_name,
             'source_customer_id': customer.source_customer_id,
             'orders': customer.orders,
             'upserted_at': customer.upserted_at
@@ -33,7 +33,7 @@ class DynamoClient:
     def put_order(self, order, customer):
         response = self.order_table.put_item(Item={
             'orderId': order.id,
-            'sourceName': order.souce_name,
+            'sourceName': order.source_name,
             'sourceOrderId': order.source_order_id,
             'customerId': customer.customerId,
             'totalPrice': order.price,
