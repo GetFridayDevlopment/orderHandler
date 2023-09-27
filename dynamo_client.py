@@ -32,13 +32,13 @@ class DynamoClient:
 
     def put_order(self, order, customer):
         response = self.order_table.put_item(Item={
-            'orderId': order.id,
-            'sourceName': order.source_name,
-            'sourceOrderId': order.source_order_id,
-            'customerId': customer.customer_id,
-            'totalPrice': order.price,
-            'orderItems': order.order_items,
-            'upsertedAt': str(datetime.now())
+            'order_id': order.id,
+            'source_name': order.source_name,
+            'source_order_id': order.source_order_id,
+            'customer_id': customer.customer_id,
+            'total_price': order.price,
+            'order_items': order.order_items,
+            'upserted_at': str(datetime.now())
         })
 
         return response['ResponseMetadata']['HTTPStatusCode'] == 200
