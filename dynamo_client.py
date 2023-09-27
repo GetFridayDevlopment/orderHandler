@@ -14,8 +14,8 @@ class DynamoClient:
         print("source_customer_id " + str(source_customer_id))
         try:
             scan_kwargs = {
-                'FilterExpression': Key('sourceCustomerId').eq(source_customer_id),
-                'ExpressionAttributeNames': {"#sourceCustomerId": "sourceCustomerId"}}
+                'FilterExpression': Key('sourceCustomerId').eq(source_customer_id)
+            }
             response = self.cust_table.scan(scan_kwargs)
         except ClientError as err:
             print(
