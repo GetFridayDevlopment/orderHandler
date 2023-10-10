@@ -78,6 +78,6 @@ def lambda_handler(event, context):
   
 
     if qr_codes:
-        email_client.send_email_with_qr_code('sivasankar.selva@gmail.com', 'QR Code Email', qr_codes, esim_details)
+        email_client.send_email_with_qr_code(raw_payload['contact_email'], 'QR Code Email', qr_codes, esim_details)
     else:
         print('QR code data not found in DynamoDB')
