@@ -35,7 +35,7 @@ class DynamoClient:
     def put_order(self, order, customer):
         response = self.order_table.put_item(Item={
                     'order_id':order.id,
-                    'source_name':order.souce_name,
+                    'source_name':order.source_name,
                     'source_order_id': order.source_order_id,
                     'customer_id': customer.customer_id,
                     'total_price': Decimal(str(order.price)),
