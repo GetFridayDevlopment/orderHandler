@@ -3,7 +3,6 @@ import json
 from order import Order
 import os
 import zipfile
-from PIL import Image
 import io
 import boto3
 
