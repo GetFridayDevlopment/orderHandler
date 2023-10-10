@@ -3,7 +3,7 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileType, Disposition
 import base64
 from botocore.exceptions import ParamValidationError
-import requests
+import urllib3
 import boto3
 
 class EmailClient:
@@ -58,24 +58,3 @@ class EmailClient:
 
         except Exception as e:
             print(f"Error sending email: {str(e)}")
-
-    def send_qr_code_to_customer(self, order):
-        # Create a SendGrid client
-        sg = SendGridAPIClient(self.api_key)
-        # Read the HTML email template from a file
-        with open('qr_code_email_template.html', 'r') as template_file:
-            email_template = template_file.read()   
-        # Create a Mail object with your email details
-        message = Mail(
-            from_email='hello@easyesim.co',
-            to_emails='sivasankar.selva@gmail.com',
-            subject='Test Email',
-            html_content=email_template
-        )
-
-        try:
-            # Send the email
-            response = sg.send(message)
-            print("Email sent successfully")
-        except Exception as e:
-            print("Error sending email:", str(e))
