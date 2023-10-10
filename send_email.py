@@ -3,7 +3,6 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileType, Disposition
 import base64
 from botocore.exceptions import ParamValidationError
-import urllib3
 import boto3
 
 class EmailClient:
