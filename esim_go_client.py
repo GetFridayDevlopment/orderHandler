@@ -1,4 +1,4 @@
-import requests
+import urllib3
 import json
 from order import Order
 import os
@@ -26,7 +26,8 @@ class EsimGoClient:
             }]
         }
         headers = {"X-API-Key": self.auth_key}
-        r = requests.post(url, data=json.dumps(payload), headers=headers)
+        http = urllib3.PoolManager()
+        r = http.request('POST', url, body=json.dumps(payload), headers=headers)
         print(r.text)
         return r.text
 
@@ -34,7 +35,8 @@ class EsimGoClient:
         url = "https://api.esim-go.com/v2.2/esims/assignments?reference="+order_reference
         payload={}
         headers = {"X-API-Key": self.auth_key, 'Accept': 'application/json'}
-        r = requests.get(url, data=payload, headers=headers)
+        http = urllib3.PoolManager()
+        r = http.request('GET', url, fields=payload, headers=headers)
         print(r.text)
         return r.text
     
@@ -42,7 +44,8 @@ class EsimGoClient:
         url = "https://api.esim-go.com/v2.2/esims/assignments?reference=" + order_reference
         payload = {}
         headers = {"X-API-Key": self.auth_key, 'Accept': 'application/zip'}
-        response = requests.get(url, data=payload, headers=headers)
+        http = urllib3.PoolManager()
+        response = http.request('GET', url, fields=payload, headers=headers)
         image_data_list = []  # Initialize an array to store image data
 
         if response.status_code == 200:
