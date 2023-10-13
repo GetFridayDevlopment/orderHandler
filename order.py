@@ -14,5 +14,6 @@ class Order:
 
         raw_items = payload['line_items']
         for item in raw_items:
+            print(item)
             self.order_items.append(
-                LineItem(item['sku'], item['price']).asdict())
+                LineItem(item['sku'], item['price'], item['quantity']).asdict())
