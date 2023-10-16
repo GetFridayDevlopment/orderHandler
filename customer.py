@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 class Customer:
     def __init__(self, customer_id, source_name, source_customer_id, orders):
@@ -7,7 +7,7 @@ class Customer:
         self.source_name = source_name
         self.source_customer_id = source_customer_id
         self.orders = orders
-        self.upserted_at = str(datetime.now())
+        self.upserted_at = str(datetime.now(timezone.utc).isoformat())
 
     @classmethod
     def from_dynamo(cls, dict):

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from boto3.dynamodb.conditions import Key
 import boto3
 from decimal import Decimal
@@ -38,7 +38,7 @@ class DynamoClient:
             'customer_id': customer.customer_id,
             'total_price': Decimal(str(order.price)),
             'order_items': order.order_items,
-            'upserted_at': str(datetime.now())
+            'upserted_at': str(datetime.now(timezone.utc).isoformat())
         })
         
         return response['ResponseMetadata']['HTTPStatusCode'] == 200
@@ -59,7 +59,7 @@ class DynamoClient:
             'currency': esim_order['currency'],
             'total': esim_order['total'],
             'order': esim_order['order'],
-            'upserted_at': str(datetime.now())
+            'upserted_at': str(datetime.now(timezone.utc).isoformat())
         })
         
         return esim_order['orderReference']
