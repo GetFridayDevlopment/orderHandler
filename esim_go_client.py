@@ -13,22 +13,31 @@ class EsimGoClient:
         self.s3_bucket_name = 'esim-qrcode'
 
     def new_order(self, order):
-        print(order.order_items[0]['sku'])
         url = 'https://api.esim-go.com/v2.2/orders'
+        
+        # Initialize an empty list to store order items in the payload
+        order_items_payload = []
+
+        for order_item in order.order_items:
+            # Create a payload for each order item
+            item_payload = {
+                "type": "bundle",
+                "quantity": order_item['qty'],
+                "item": order_item['sku']
+            }
+            order_items_payload.append(item_payload)
+
         payload = {
             "type": "transaction",
             "assign": True,
-            "Order": [{
-                "type": "bundle",
-                "quantity":1,
-                "item": order.order_items[0]['sku'] #Temporary
-            }]
+            "Order": order_items_payload
         }
         headers = {"X-API-Key": self.auth_key}
         http = urllib3.PoolManager()
         r = http.request('POST', url, body=json.dumps(payload), headers=headers)
-        print(r.text)
-        return r.text
+
+        response_text = r.data.decode('utf-8')
+        return response_text
 
     def get_esim_details(self, order_reference):
         url = "https://api.esim-go.com/v2.2/esims/assignments?reference="+order_reference
@@ -36,8 +45,8 @@ class EsimGoClient:
         headers = {"X-API-Key": self.auth_key, 'Accept': 'application/json'}
         http = urllib3.PoolManager()
         r = http.request('GET', url, fields=payload, headers=headers)
-        print(r.text)
-        return r.text
+        response_text = r.data.decode('utf-8')
+        return response_text
     
     def get_esim_qrcode(self, order_reference):
         url = "https://api.esim-go.com/v2.2/esims/assignments?reference=" + order_reference
@@ -47,9 +56,9 @@ class EsimGoClient:
         response = http.request('GET', url, fields=payload, headers=headers)
         image_data_list = []  # Initialize an array to store image data
 
-        if response.status_code == 200:
+        if response.status == 200:
             # Create a temporary in-memory buffer to store the ZIP file content
-            zip_buffer = response.content
+            zip_buffer = response.data
 
             # Unzip the content
             with zipfile.ZipFile(io.BytesIO(zip_buffer), 'r') as zip_file:
@@ -57,7 +66,6 @@ class EsimGoClient:
                 for file_info in zip_file.infolist():
                     # Check if the file has a PNG extension (you can adjust this check)
                     if file_info.filename.lower().endswith('.png'):
-                        print(file_info.filename)
                         # Read the PNG image and convert it to binary
                         with zip_file.open(file_info) as png_file:
                             image_data = png_file.read()                           
@@ -81,7 +89,7 @@ class EsimGoClient:
                         
                         print(f"PNG image '{file_info.filename}' extracted from ZIP")
                     else:
-                        print(f"Ignoring file '{file_info.filename}'")
+                        print(f"Ignoring file '{file_file_info.filename}'")
            
             return image_data_list
         else:
