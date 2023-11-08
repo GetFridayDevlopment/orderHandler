@@ -89,7 +89,7 @@ class EsimGoClient:
                         
                         print(f"PNG image '{file_info.filename}' extracted from ZIP")
                     else:
-                        print(f"Ignoring file '{file_file_info.filename}'")
+                        print(f"Ignoring file '{file_info.filename}'")
            
             return image_data_list
         else:
