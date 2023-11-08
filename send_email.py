@@ -22,7 +22,7 @@ class EmailClient:
                 
                 # Generate a subject based on the number of QR codes
                 if len(qr_code_binary) > 1:
-                    subject = "Your eSIM - "+ str(index+1) + " details. Order Number " + str(order_no)
+                    subject = "Your eSIM details ("+ str(index+1)+" of "+ str(len(qr_code_binary))  +"). Order Number " + str(order_no)
                 else:
                     subject = "Your eSIM details. Order Number " + str(order_no)
 
