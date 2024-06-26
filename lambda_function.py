@@ -44,6 +44,7 @@ def lambda_handler(event, context):
     if not esim_order_details:
         logger.error("Failed to generate a new order in EsimGo: %s", str(order))
         dynamo_client.update_order_status(order.id, "esim_order_creation_failed")
+        email_client.send_email_on_failure("Failed to generate a new order in EsimGo", str(order))
         return
 
     logger.info("Esim Order Success")
@@ -53,6 +54,7 @@ def lambda_handler(event, context):
     if not order_id:
         logger.error("Failed to generate a new order: %s", str(esim_order_details))
         dynamo_client.update_order_status(order.id, "dynamodb_esim_order_creation_failed")
+        email_client.send_email_on_failure("Failed to generate a new order", str(esim_order_details))
         return
     else:
         logger.info("Esim Order Updated with ID: %s", order_id)
@@ -63,6 +65,7 @@ def lambda_handler(event, context):
     if not esim_order_details:
         logger.error("Failed to get eSIM details: %s", str(esim_order_details))
         dynamo_client.update_order_status(order.id, "esim_details_retrieval_failed")
+        email_client.send_email_on_failure("Failed to get eSIM details", str(esim_order_details))
         return
     else:
         response = dynamo_client.update_esim_order(order_id, esim_order_details, raw_payload['line_items'])
@@ -71,6 +74,7 @@ def lambda_handler(event, context):
     if not image_data:
         logger.error("Failed to get eSIM QR code details: %s", str(esim_order_details))
         dynamo_client.update_order_status(order.id, "esim_qrcode_retrieval_failed")
+        email_client.send_email_on_failure("Failed to get eSIM QR code details", str(esim_order_details))
         return
     else:
         response = dynamo_client.update_esim_qr_code(order_id, image_data)
@@ -82,12 +86,14 @@ def lambda_handler(event, context):
     if not qr_codes:
         logger.error("Failed to get QR codes from the database: %s", str(qr_codes))
         dynamo_client.update_order_status(order.id, "dynamodb_qrcode_retrieval_failed")
+        email_client.send_email_on_failure("Failed to get QR codes from the database", str(qr_codes))
         return
 
     esim_details = dynamo_client.get_esim_from_db(order_id)
     if not esim_details:
         logger.error("Failed to get eSIM details from the database: %s", str(esim_details))
         dynamo_client.update_order_status(order.id, "dynamodb_esim_details_retrieval_failed")
+        email_client.send_email_on_failure("Failed to get eSIM details from the database", str(esim_details))
         return
 
     logger.info("Sending email to client")
