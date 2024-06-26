@@ -4,11 +4,18 @@ import urllib3
 from botocore.exceptions import ParamValidationError
 import boto3
 
+import logging
+
+# Initialize logger
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
 class EmailClient:
     def __init__(self):
         self.api_key = os.environ['SEND_GRID_API_KEY']
         self.s3_client = boto3.client('s3')
         self.s3_bucket_name = 'esim-qrcode'
+    
     
     def send_email_with_qr_code(self, email_to, qr_code_binary, esim_details, order_no):
         try:
@@ -80,12 +87,54 @@ class EmailClient:
                     )
 
                     if response.status == 202:
-                        print(f"Email sent successfully with status code: {response.status}")
+                        # print(f"Email sent successfully with status code: {response.status}")
+                        logger.info(f"Error email sent successfully with status code: {response.status}")
                     else:
-                        print(f"Email sending failed with status code: {response.status}")
+                        # print(f"Email sending failed with status code: {response.status}")
+                        logger.error(f"Error email sending failed with status code: {response.status}")
 
                 except ParamValidationError as e:
-                    print(f"Skipping invalid image data: {str(e)}")
+                    # print(f"Skipping invalid image data: {str(e)}")
+                    logger.error(f"Error sending error email: {str(e)}")
 
         except Exception as e:
             print(f"Error sending email: {str(e)}")
+            
+        
+    def send_email_on_failure(self, subject, body):
+        try:
+            email_data = {
+                "personalizations": [
+                    {
+                        "to": [{"email": "hello@easyesim.co"}, {"email":"sivasankar.selva@gmail.com"}],
+                        "subject": subject
+                    }
+                ],
+                "from": {"email": "hello@easyesim.co", "name": 'Error Notification'},
+                "content": [
+                    {
+                        "type": "text/plain",
+                        "value": body
+                    }
+                ]
+            }
+
+            encoded_data = json.dumps(email_data).encode('utf-8')
+            headers = {
+                "Authorization": f"Bearer {self.api_key}",
+                "Content-Type": "application/json"
+            }
+            response = self.http.request(
+                'POST',
+                'https://api.sendgrid.com/v3/mail/send',
+                body=encoded_data,
+                headers=headers
+            )
+
+            if response.status == 202:
+                logger.info(f"Error email sent successfully with status code: {response.status}")
+            else:
+                logger.error(f"Error email sending failed with status code: {response.status}")
+
+        except Exception as e:
+            logger.error(f"Error sending error email: {str(e)}")

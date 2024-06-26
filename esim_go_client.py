@@ -6,6 +6,7 @@ import zipfile
 import io
 import boto3
 import logging
+import time 
 
 # Initialize logger
 logger = logging.getLogger()
@@ -18,7 +19,7 @@ class EsimGoClient:
         self.s3_bucket_name = 'esim-qrcode'
 
     def new_order(self, order):
-        url = 'https://api.esim-go.com/v2.2/orders'
+        url = 'https://api.esim-go.com/v2.3/orders'
         order_items_payload = []
 
         for order_item in order.order_items:
@@ -42,16 +43,22 @@ class EsimGoClient:
                 r = http.request('POST', url, body=json.dumps(payload), headers=headers)
                 response_text = r.data.decode('utf-8')
                 logger.info("New order response: %s", response_text)
+                 # Check for 503 status code
+                if r.status == 503:
+                    logger.info("Received 503 status code. Adding delay before retrying...")
+                    time.sleep(5)  # Add a delay of 5 seconds (adjust as needed)
+                    
                 return response_text
             except Exception as e:
                 logger.error("Attempt %d: Failed to create new order: %s", attempt + 1, str(e))
                 if attempt < 2:
                     logger.info("Retrying...")
+                    time.sleep(5)  # Add a delay before retrying (adjust as needed)
                 else:
                     raise
 
     def get_esim_details(self, order_reference):
-        url = "https://api.esim-go.com/v2.2/esims/assignments?reference=" + order_reference
+        url = "https://api.esim-go.com/v2.3/esims/assignments?reference=" + order_reference
         payload = {}
         headers = {"X-API-Key": self.auth_key, 'Accept': 'application/json'}
         http = urllib3.PoolManager()
@@ -61,16 +68,23 @@ class EsimGoClient:
                 r = http.request('GET', url, fields=payload, headers=headers)
                 response_text = r.data.decode('utf-8')
                 logger.info("Get eSIM details response: %s", response_text)
+                 # Check for 500 status code or empty response
+                if r.status == 500 or not response_text:
+                    logger.info("Received 500 status code or empty response. Retrying...")
+                    time.sleep(5)  # Add a delay of 5 seconds (adjust as needed)
+                    continue
+                
                 return response_text
             except Exception as e:
                 logger.error("Attempt %d: Failed to get eSIM details: %s", attempt + 1, str(e))
                 if attempt < 2:
                     logger.info("Retrying...")
+                    time.sleep(5)  # Add a delay before retrying (adjust as needed)
                 else:
                     raise
 
     def get_esim_qrcode(self, order_reference):
-        url = "https://api.esim-go.com/v2.2/esims/assignments?reference=" + order_reference
+        url = "https://api.esim-go.com/v2.3/esims/assignments?reference=" + order_reference
         payload = {}
         headers = {"X-API-Key": self.auth_key, 'Accept': 'application/zip'}
         http = urllib3.PoolManager()
@@ -78,6 +92,12 @@ class EsimGoClient:
         for attempt in range(3):
             try:
                 response = http.request('GET', url, fields=payload, headers=headers)
+                 # Check for 500 status code or empty response
+                if response.status == 500 or not response.data:
+                    logger.info("Received 500 status code or empty response. Retrying...")
+                    time.sleep(5)  # Add a delay of 5 seconds (adjust as needed)
+                    continue
+                
                 if response.status == 200:
                     zip_buffer = response.data
                     image_data_list = []
@@ -102,6 +122,7 @@ class EsimGoClient:
                 logger.error("Attempt %d: Failed to get eSIM QR code: %s", attempt + 1, str(e))
                 if attempt < 2:
                     logger.info("Retrying...")
+                    time.sleep(5)
                 else:
                     raise
 
