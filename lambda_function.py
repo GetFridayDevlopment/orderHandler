@@ -16,6 +16,19 @@ def lambda_handler(event, context):
     email_client = EmailClient()
     esim_client = EsimGoClient()
 
+    # Check if the source_order_id exists in the database
+    existing_order = dynamo_client.get_order_by_source_order_id(order.source_order_id)
+    if existing_order:
+        current_status = existing_order['status']
+        if current_status == "esim_order_created":
+            dynamo_client.update_order_status(existing_order['order_id'], "dynamodb_esim_order_creation_failed")
+            return
+        elif current_status == "esim_order_saved":
+            dynamo_client.update_order_status(existing_order['order_id'], "esim_details_retrieval_failed")
+            return
+        elif current_status == "order_saved":
+            dynamo_client.delete_order(existing_order['order_id'])
+
     existing_customers = dynamo_client.get_customers(raw_payload['customer']['id'])
     if len(existing_customers) > 1:
         logger.error("Multiple customers returned for id: %s", str(raw_payload['customer']['id']))
@@ -50,7 +63,7 @@ def lambda_handler(event, context):
     logger.info("Esim Order Success")
     dynamo_client.update_order_status(order.id, "esim_order_created")
 
-    order_id = dynamo_client.put_esim_order(esim_order_details, order)
+    order_id = dynamo_client.put_esim_order(esim_order_details, order, raw_payload['contact_email'], raw_payload['order_number'])
     if not order_id:
         logger.error("Failed to generate a new order: %s", str(esim_order_details))
         dynamo_client.update_order_status(order.id, "dynamodb_esim_order_creation_failed")
@@ -103,3 +116,5 @@ def lambda_handler(event, context):
     else:
         logger.warning('QR code data not found in DynamoDB')
         dynamo_client.update_order_status(order.id, "qrcode_data_not_found")
+    
+    esim_client.update_esim(esim_details, raw_payload['order_number'])

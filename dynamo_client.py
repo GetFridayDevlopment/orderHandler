@@ -50,7 +50,7 @@ class DynamoClient:
         logger.info("Put order success: %s", success)
         return success
 
-    def put_esim_order(self, esim_order, order_table_ref):
+    def put_esim_order(self, esim_order, order_table_ref, email_id, shopify_order_id):
         esim_order = json.loads(esim_order)
         esim_order['total'] = Decimal(str(esim_order['total']))
         for order_item in esim_order['order']:
@@ -63,6 +63,8 @@ class DynamoClient:
             'currency': esim_order['currency'],
             'total': esim_order['total'],
             'order': esim_order['order'],
+            'email_id': email_id,
+            'shopify_order_id':shopify_order_id,
             'upserted_at': str(datetime.now(timezone.utc).isoformat())
         })
         logger.info("Put eSIM order response: %s", response)
@@ -130,3 +132,16 @@ class DynamoClient:
         )
         logger.info("Update order status response: %s", response)
         return response
+
+    def get_order_by_source_order_id(self, source_order_id):
+        try:
+            response = self.order_table.get_item(
+                Key={'source_order_id': source_order_id}
+            )
+            if 'Item' in response:
+                return response['Item']
+            else:
+                return None
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return None
