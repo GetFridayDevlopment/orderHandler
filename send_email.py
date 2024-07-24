@@ -46,10 +46,17 @@ class EmailClient:
                         email_template = template_file.read()
 
                     parts = bundle.split('_')
+                    
+                    # Check if the bundle contains 'esim_UL_'
+                    if 'esim_UL_' in bundle:
+                        formatted_bundle = "Unlimited"
+                    else:
+                        formatted_bundle = parts[1] if len(parts) > 1 else bundle
+
 
                     # Format the template with the dynamic URL
                     email_template = email_template.replace('{{esim_title}}', esim_title)
-                    email_template = email_template.replace('{{bundle}}', parts[1])
+                    email_template = email_template.replace('{{bundle}}', formatted_bundle)
                     email_template = email_template.replace('{{qr_code_url}}', qr_code_url)
                     email_template = email_template.replace('{{matchingId}}', matchingId)
                     email_template = email_template.replace('{{rspUrl}}', rspUrl)
@@ -59,6 +66,7 @@ class EmailClient:
                         "personalizations": [
                             {
                                 "to": [{"email": email_to}],
+                                "bcc": [{"email": "esimdetails@easyesim.co"}], 
                                 "subject": subject
                             }
                         ],
@@ -109,6 +117,7 @@ class EmailClient:
                 "personalizations": [
                     {
                         "to": [{"email": "hello@easyesim.co"}, {"email":"sivasankar.selva@gmail.com"}],
+                        "bcc": [{"email": "esimdetails@easyesim.co"}], 
                         "subject": subject
                     }
                 ],

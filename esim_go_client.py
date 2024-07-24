@@ -127,3 +127,41 @@ class EsimGoClient:
                     raise
 
         return None
+
+    def update_esim(self, esim_details, customer_ref):
+        url = "https://api.esim-go.com/v2.4/esims"
+        http = urllib3.PoolManager()
+
+        for esim_detail in esim_details:
+            iccid = esim_detail['iccid']
+            payload = json.dumps({
+                "iccid": iccid,
+                "customerRef": str(customer_ref)
+            })
+            headers = {
+                'X-API-Key': self.auth_key,
+                'Content-Type': 'application/json'
+            }
+
+            for attempt in range(3):
+                try:
+                    response = http.request(
+                        'PUT',
+                        url,
+                        body=payload,
+                        headers=headers
+                    )
+                    response_text = response.data.decode('utf-8')
+                    if response.status == 503:
+                        print("Received 503 status code. Adding delay before retrying...")
+                        time.sleep(5)  # Add a delay of 5 seconds (adjust as needed)
+                        continue
+                    print("Update eSIM response:", response_text)
+                    break  # Exit the retry loop if successful
+                except Exception as e:
+                    print(f"Attempt {attempt + 1}: Failed to update eSIM: {str(e)}")
+                    if attempt < 2:
+                        print("Retrying...")
+                        time.sleep(5)  # Add a delay before retrying (adjust as needed)
+                    else:
+                        raise
