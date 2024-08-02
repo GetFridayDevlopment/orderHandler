@@ -49,7 +49,11 @@ class EmailClient:
                     
                     # Check if the bundle contains 'esim_UL_'
                     if 'esim_UL_' in bundle:
-                        formatted_bundle = "Unlimited"
+                        days = parts[2][:-1]  # This strips the last character assuming it's always 'D' for 'Day'
+                        if days.isdigit():  # Ensure that the extracted part is a digit
+                            formatted_bundle = f"Unlimited - {days} Day{'s' if int(days) > 1 else ''}"
+                        else:
+                            formatted_bundle = "Unlimited"
                     else:
                         formatted_bundle = parts[1] if len(parts) > 1 else bundle
 
@@ -97,16 +101,20 @@ class EmailClient:
                     if response.status == 202:
                         # print(f"Email sent successfully with status code: {response.status}")
                         logger.info(f"QR code email sent successfully with status code: {response.status}")
+                        return True
                     else:
                         # print(f"Email sending failed with status code: {response.status}")
                         logger.error(f"QR code email sending failed with status code: {response.status}")
+                        return False
 
                 except ParamValidationError as e:
                     # print(f"Skipping invalid image data: {str(e)}")
                     logger.error(f"Error sending QR code email: {str(e)}")
+                    return False
 
         except Exception as e:
             print(f"Error sending email: {str(e)}")
+            return False
             
         
     def send_email_on_failure(self, subject, body):
@@ -144,8 +152,11 @@ class EmailClient:
 
             if response.status == 202:
                 logger.info(f"Error email sent successfully with status code: {response.status}")
+                return True
             else:
                 logger.error(f"Error email sending failed with status code: {response.status}")
+                return False
 
         except Exception as e:
             logger.error(f"Error sending error email: {str(e)}")
+            return False
