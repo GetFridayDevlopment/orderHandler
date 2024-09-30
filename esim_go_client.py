@@ -47,7 +47,8 @@ class EsimGoClient:
                 if r.status == 503:
                     logger.info("Received 503 status code. Adding delay before retrying...")
                     time.sleep(5)  # Add a delay of 5 seconds (adjust as needed)
-                    
+                    continue
+                
                 return response_text
             except Exception as e:
                 logger.error("Attempt %d: Failed to create new order: %s", attempt + 1, str(e))
@@ -56,6 +57,9 @@ class EsimGoClient:
                     time.sleep(5)  # Add a delay before retrying (adjust as needed)
                 else:
                     raise
+        # If we exhausted all retries and still failed, return the last response or error
+        print("All retry attempts failed")
+        return None
 
     def get_esim_details(self, order_reference):
         url = "https://api.esim-go.com/v2.3/esims/assignments?reference=" + order_reference
@@ -82,6 +86,9 @@ class EsimGoClient:
                     time.sleep(10)  # Add a delay before retrying (adjust as needed)
                 else:
                     raise
+        # If we exhausted all retries and still failed, return the last response or error
+        print("All retry attempts failed")
+        return None
 
     def get_esim_qrcode(self, order_reference):
         url = "https://api.esim-go.com/v2.3/esims/assignments?reference=" + order_reference
@@ -125,7 +132,8 @@ class EsimGoClient:
                     time.sleep(5)
                 else:
                     raise
-
+                
+        print("All retry attempts failed")
         return None
 
     def update_esim(self, esim_details, customer_ref):
@@ -165,3 +173,6 @@ class EsimGoClient:
                         time.sleep(5)  # Add a delay before retrying (adjust as needed)
                     else:
                         raise
+        
+            print("All retry attempts failed")
+            return None
